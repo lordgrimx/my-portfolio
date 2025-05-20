@@ -1,7 +1,9 @@
 'use client'
 
-import React, { useRef } from 'react'
+import React, { use, useEffect, useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
+import { fetchGitHubData, fetchLanguages } from '@/utils/githubAPI'
+import { useMutation, useQueries, useQuery } from 'convex/react';
 
 const projects = [
   {
@@ -42,12 +44,100 @@ const projects = [
   }
 ]
 
+
+
 function Projects() {
   const projectsRef = useRef(null)
   const isInView = useInView(projectsRef, { once: true, amount: 0.1 })
 
+  const [repos, setRepos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const createProject = useMutation("projects:createProject");
+  const [languages, setLanguages] = useState([]);
+  const reposCount = useQuery("about:getRepoCount")
+  const updateRepoCount = useMutation("about:updateRepoCount");
+  console.log("reposCount:", reposCount);
+  
+
+  useEffect(() => {
+    const fetchData = async () => {
+      console.log("GitHub verisi çekiliyor...");
+      setLoading(true);
+      try {
+        const data = await fetchGitHubData('repos');
+        setRepos(data);
+        console.log("GitHub verisi başarıyla çekildi:", data);
+      } catch (error) {
+        console.error("GitHub verisi çekilirken hata:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, []);
+
+
+  useEffect(() => {
+    const saveData = async () => {
+      console.log("Veri Convex'e kaydediliyor...");
+      try {
+        // DB'deki repo sayısını kontrol et
+        const dbRepoCount = reposCount; // undefined ise 0 kullan
+        console.log("DB'deki repo sayısı:", dbRepoCount);
+        console.log("GitHub'dan alınan repo sayısı:", repos.length);
+        
+        // Eğer DB'deki repo sayısı GitHub'dan alınan repo sayısından az ise
+        if (repos.length > dbRepoCount) {
+          // Sadece yeni repoları kaydet (DB'de olmayan)
+          const newRepos = repos.slice(dbRepoCount);
+          console.log("Kaydedilecek yeni repo sayısı:", newRepos.length);
+          await updateRepoCount({ count: repos.length });
+
+          for (const repo of newRepos) {
+            let repoLanguages = [];
+            try {
+              repoLanguages = await fetchLanguages(repo.name, repo.languages_url);
+              console.log("Diller başarıyla alındı:", repoLanguages);
+              setLanguages(repoLanguages);
+            } catch (error) {
+              console.error("Diller alınırken hata:", error);
+            }
+
+            await createProject({
+              title: repo.name,
+              description: repo.description || "",
+              imageURL: repo.imageURL || "",
+              demoURL: repo.homepage || "",
+              githubURL: repo.html_url,
+              languages: repoLanguages || [],
+            });
+          }
+          console.log("Yeni repolar Convex'e başarıyla kaydedildi.");
+        } else {
+          console.log("Tüm repolar zaten DB'de kayıtlı, yeni kayıt yapılmadı.");
+        }
+      } catch (error) {
+        console.error("Convex'e veri kaydedilirken hata:", error);
+      }
+    };
+    
+    // Sadece repos doluysa ve fetchData işlemi tamamlandıysa çalıştır
+    if (repos.length > 0 && !loading) {
+      saveData();
+    }
+  }, [repos, loading, reposCount, createProject]);
+  
+  // useEffect hook'u ile reposCount'un undefined olup olmadığını kontrol et
+  useEffect(() => {
+    if (reposCount !== undefined) {
+      console.log("reposCount güncel değeri:", reposCount);
+    }
+  }, [reposCount]);
+
+
   return (
-    <div 
+    <section 
       id="projects" 
       className="py-20 bg-gradient-to-b from-indigo-950/50 to-black min-h-screen"
     >
@@ -81,7 +171,7 @@ function Projects() {
           ))}
         </div>
       </div>
-    </div>
+    </section>
   )
 }
 
@@ -150,4 +240,4 @@ function ProjectCard({ project, index, isInView }) {
   )
 }
 
-export default Projects 
+export default Projects

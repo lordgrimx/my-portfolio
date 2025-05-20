@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
+import { Button } from '@/components/ui/button'
 
 function Hero() {
   const containerRef = useRef(null)
@@ -24,10 +25,10 @@ function Hero() {
     const lines = {
       comment: '// Merhaba, ben Sabri Alperen',
       declaration: 'const myProfile = {',
-      role: '  role: "Front-end Developer",',
-      email: '  email: "sabrialperen@example.com",',
-      github: '  github: "https://github.com/sabrialperen",',
-      skills: '  skills: ["React", "Next.js", "Tailwind CSS", "JavaScript"],',
+      role: '  role: "Full-Stack Web Developer",',
+      email: '  email: "sabri.alperen.kaya@gmail.com",',
+      github: '  github: "https://github.com/lordgrimx",',
+      skills: '  skills: ["React", "Next.js", "Tailwind CSS", "JavaScript","C#" , "Python"],',
       interests: '  interests: ["UI/UX", "Modern Web", "3D Effects"]',
       closing: '};'
     }
@@ -132,10 +133,10 @@ function Hero() {
   }
 
   return (
-    <div 
+    <section 
       ref={containerRef}
       id="hello"
-      className="pt-32 pb-20 px-8 max-w-7xl mx-auto min-h-[90vh] flex flex-col justify-center"
+      className="pt-32 pb-20 px-8 max-w-7xl mx-auto min-h-[100vh] flex flex-col justify-center"
     >
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -377,13 +378,26 @@ function Hero() {
         transition={{ duration: 1, delay: 0.4 }}
         className="mt-12 flex justify-center"
       >
-        <a href="#projects">
-          <button className="bg-gradient-to-r text-white font-bold py-3 px-8 rounded-full transition-all duration-300 shadow-lg transform hover:scale-105 from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 hover:shadow-emerald-500/20 dark:from-emerald-600 dark:to-teal-700 dark:hover:from-emerald-700 dark:hover:to-teal-800 dark:hover:shadow-emerald-600/10">
-            Projelerimi İncele
-          </button>
+        <a href="#projects" className='mr-5 ml-5'>
+          <Button 
+            variant="default" 
+            size="lg"
+            className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 dark:from-emerald-600 dark:to-teal-700 dark:hover:from-emerald-700 dark:hover:to-teal-800 font-bold rounded-full shadow-lg hover:shadow-emerald-500/20 dark:hover:shadow-emerald-600/10 transform hover:scale-105 transition-all duration-300"
+          >
+            Projelerimi incele
+          </Button>
+        </a>
+        <a href="#" className='mr-5 ml-5'>
+          <Button 
+            variant="outline" 
+            size="lg"
+            className="hover:from-emerald-600 hover:to-teal-700 dark:from-emerald-600 dark:to-teal-700 dark:hover:from-emerald-700 dark:hover:to-teal-800 font-bold rounded-full shadow-lg hover:shadow-emerald-500/20 dark:hover:shadow-emerald-600/10 transform hover:scale-105 transition-all duration-300"
+          >
+            CV indir
+          </Button>
         </a>
       </motion.div>
-    </div>
+    </section>
   )
 }
 

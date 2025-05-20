@@ -56,7 +56,7 @@ function Contact() {
   ]
 
   return (
-    <div 
+    <section 
       id="contact-me" 
       className="py-24 bg-gradient-to-b from-indigo-950/50 to-black min-h-screen"
     >
@@ -261,7 +261,7 @@ function Contact() {
           </p>
         </motion.div>
       </div>
-    </div>
+    </section>
   )
 }
 

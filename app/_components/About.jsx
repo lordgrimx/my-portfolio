@@ -43,7 +43,7 @@ function About() {
   const isExperienceInView = useInView(experienceRef, { once: true, amount: 0.3 })
 
   return (
-    <div 
+    <section 
       id="about-me" 
       className="py-24 bg-gradient-to-b from-black to-indigo-950/50 min-h-screen"
     >
@@ -194,7 +194,7 @@ function About() {
           </div>
         </motion.div>
       </div>
-    </div>
+    </section>
   )
 }
 
