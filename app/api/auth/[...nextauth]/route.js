@@ -58,10 +58,17 @@ export const authOptions = {
     },
     async signIn({ user, account, profile }) {
       if (account.provider === "github") {
-        // GitHub'dan gelen kullanıcı bilgilerini burada işleyebilirsiniz
-        console.log("GitHub user:", profile)
+        // GitHub ile giriş yapan kullanıcı sizin GitHub hesabınız mı kontrol edelim
+        // İzin verilen GitHub kullanıcı adınızı veya e-posta adresinizi burada belirtin
+        const allowedGithubUsername = process.env.NEXT_PUBLIC_GITHUB_ACCOUNT_USERNAME; // Buraya kendi GitHub kullanıcı adınızı yazın
+        const allowedGithubEmail = process.env.NEXT_PUBLIC_GITHUB_ACCOUNT_MAIL; // Buraya kendi GitHub e-posta adresinizi yazın
+        
+        if (profile.login !== allowedGithubUsername && profile.email !== allowedGithubEmail) {
+          console.log("Yetkisiz GitHub kullanıcısı erişim denemesi:", profile.login);
+          return false; // Erişim reddedildi
+        }
       }
-      return true
+      return true; // Diğer tüm giriş yöntemleri ve izin verilen GitHub kullanıcısı için giriş izni verildi
     },
     async redirect({ url, baseUrl }) {
       if (url.startsWith("/admin")) {
@@ -69,12 +76,12 @@ export const authOptions = {
       }
       return baseUrl
     },
-    pages: {
-      signIn: "/admin/login", // Custom sign-in page
-      error: "/admin/login", // Error page
-      verifyRequest: "/admin/login", // (used for check email message)
-      newUser: null, // Will disable the new account creation screen
-    },
+  },
+  pages: {
+    signIn: "/admin/login", // Custom sign-in page
+    error: "/admin/login", // Error page
+    verifyRequest: "/admin/login", // (used for check email message)
+    newUser: null, // Will disable the new account creation screen
   },
   secret: process.env.NEXTAUTH_SECRET,
 }
