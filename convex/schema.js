@@ -58,6 +58,14 @@ export default defineSchema({
         text: v.string(),
         imageURL: v.optional(v.string()),
         rating: v.optional(v.number())
-    })
+    }),
+    user: defineTable({
+        username: v.string(),
+        password: v.string(),
+        email: v.string(),
+        role: v.optional(v.string()), // "admin", "user" gibi roller
+        createdAt: v.number(), // Unix timestamp olarak tarih
+        updatedAt: v.number()  // Unix timestamp olarak tarih
+    }),
 
 });
