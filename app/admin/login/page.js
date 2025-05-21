@@ -2,7 +2,9 @@
 
 import Image from "next/image";
 import { useForm } from "react-hook-form";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -22,19 +24,40 @@ export default function AdminLogin() {
       password: ""
     }
   });
+  
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  
+  // Eğer kullanıcı zaten giriş yapmışsa, admin paneline yönlendir
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.push("/admin");
+    }
+  }, [status, router]);
 
   // Form gönderildiğinde çalışacak fonksiyon
   function onSubmit(data) {
-  signIn("credentials", {
-            email: data.username,
-            password: data.password,
-            redirect: true,
-            callbackUrl: "/admin"
-        }).catch(error => console.error("Login failed:", error));
-    }
+    signIn("credentials", {
+      email: data.username,
+      password: data.password,
+      redirect: true,
+      callbackUrl: "/admin"
+    }).catch(error => console.error("Login failed:", error));
+  }
 
-  return (
-    <div className="flex h-screen w-full bg-[#0a2030] text-white">
+  // Eğer oturum yükleniyorsa, bekleme mesajı göster
+  if (status === "loading") {
+    return (
+      <div className="flex h-screen w-full bg-[#0a2030] text-white items-center justify-center">
+        <p>Yükleniyor...</p>
+      </div>
+    );
+  }
+
+  // Eğer kullanıcı oturum açmamışsa, giriş formunu göster
+  if (status === "unauthenticated") {
+    return (
+      <div className="flex h-screen w-full bg-[#0a2030] text-white">
       {/* Sol Taraf - Logo ve Marka */}
       <div className="flex w-1/2 flex-col items-center justify-center border-r border-gray-700">
         <div className="flex items-center justify-center flex-start">
@@ -103,4 +126,9 @@ export default function AdminLogin() {
       </div>
     </div>
   );
+  }
+  
+  // Eğer kullanıcı zaten oturum açmışsa, bu kısmı çalıştırmaz
+  // useEffect içinde yönlendirme yapar
+  return null;
 }
